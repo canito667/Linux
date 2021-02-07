@@ -1,0 +1,47 @@
+1. Actuar como root sin activar la cuenta del superusuario
+
+La cuenta de root no está activada y no tiene asignada una contraseña, pero podemos acceder a ella en terminal. 
+Pero eso sí, sólo desde la cuenta del administrador o usuario con privilegios de root (sudo), mediante cualquiera de los dos comandos siguientes:
+
+#usuario@equipo:~$ sudo -i
+#usuario@equipo:~$ sudo su
+
+Introducimos la contraseña del usuario administrador (sudo) y en la línea ahora en lugar de nuestro usuario (jose, pepe, benjamin o el que sea)  aparecerá root.
+
+#root@equipo:~$
+
+Entonces la linea de comandos será la de root. Podemos, entonces, ejecutar comandos como superusuario sin tener que escribir previamente sudo, por ejemplo:
+
+#root@equipo:~$ apt-get update
+
+De esta forma, la cuenta de root permanece en realidad inactiva y sin contraseña. Cuando volvamos a abrir la terminar tendremos que ejecutar de nuevo el comando “sudo su”. Si estamos en otro usuario que no sea administrador esto no funcionará.
+
+2. Activar y desactivar la cuenta de superusuario “root”
+
+Para activar la cuenta de root, asignarle una contraseña, y que podamos actuar como superusuario en cualquiera de los usuarios que tengamos en el sistema con independencia de que tengan o no tengan privilegios de root, lo podemos hacer de dos formas por la terminal o gráficamente.
+2.1. Mediante terminal
+
+Tenemos que lanzar el siguiente comando:
+
+#sudo passwd root
+
+#Primero nos solicitará la contraseña de administrador (sudo); seguidamente nos pide la contraseña para asignar al usuario root (su); y
+#finalmente que repitamos la contraseña de para confirmar que no hay errores. En la terminal tendremos algo así como esto:
+
+#usuario@equipo:~$ sudo passwd root
+#[sudo] password for usuario: 
+#Introduzca la nueva contraseña de UNIX: 
+#Vuelva a escribir la nueva contraseña de UNIX: 
+#passwd: contraseña actualizada correctamente
+#usuario@equipo:~$ 
+
+La contraseña puede ser la misma de “sudo” y de “su”, o puede ser diferente, 
+que es lo que, por cuestiones de seguridad, se suele recomendar. En cualquier caso, a
+partir de ahora en cualquier usuario podremos actuar como root en la terminal identificándonos como tal:
+
+#$ su (contraseña)
+
+#Si, por el motivo que sea, quisiéramos desactivar la cuenta root
+*****************************************************************
+
+#$ sudo passwd -l root
