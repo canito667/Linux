@@ -1,0 +1,151 @@
+Scrip unistall FOGServer
+
+#Uninstall FOG
+
+#remove service
+sudo rm /etc/init.d/FOGImageReplicator
+sudo rm /etc/init.d/FOGMulticastManager
+sudo rm /etc/init.d/FOGScheduler
+
+#delete fog database
+sudo mysql
+#(or 'sudo mysql -p' if you set a root password for mysql)
+drop database fog;
+quit
+
+#Remove files
+sudo rm -rf /var/www/fog
+sudo rm -rf /var/www/html/fog 
+sudo rm -rf /opt/fog
+sudo rm -rf /tftpboot
+sudo rm -rf /images #Warning, this line deletes any existing images.
+
+#delete fog system user
+sudo userdel fog
+
+
+
+************************************
+CONFUGUARTION CON DHCP VIRTUAL BOX *
+************************************
+
+
+
+
+   +------------------------------------------+
+   |     ..#######:.    ..,#,..     .::##::.  |
+   |.:######          .:;####:......;#;..     |
+   |...##...        ...##;,;##::::.##...      |
+   |   ,#          ...##.....##:::##     ..:: |
+   |   ##    .::###,,##.   . ##.::#.:######::.|
+   |...##:::###::....#. ..  .#...#. #...#:::. |
+   |..:####:..    ..##......##::##  ..  #     |
+   |    #  .      ...##:,;##;:::#: ... ##..   |
+   |   .#  .       .:;####;::::.##:::;#:..    |
+   |    #                     ..:;###..       |
+   |                                          |
+   +------------------------------------------+
+   |      Free Computer Imaging Solution      |
+   +------------------------------------------+
+   |  Credits: http://fogproject.org/Credits  |
+   |       http://fogproject.org/Credits      |
+   |       Released under GPL Version 3       |
+   +------------------------------------------+
+
+
+   Version: 1.5.9 Installer/Updater
+
+  What version of Linux would you like to run the installation for?
+
+          1) Redhat Based Linux (Redhat, CentOS, Mageia)
+          2) Debian Based Linux (Debian, Ubuntu, Kubuntu, Edubuntu)
+          3) Arch Linux
+
+  Choice: [2] 2
+
+
+
+  Starting Debian based Installation
+
+
+  FOG Server installation modes:
+      * Normal Server: (Choice N) 
+          This is the typical installation type and
+          will install all FOG components for you on this
+          machine.  Pick this option if you are unsure what to pick.
+
+      * Storage Node: (Choice S)
+          This install mode will only install the software required
+          to make this server act as a node in a storage group
+
+  More information:  
+     http://www.fogproject.org/wiki/index.php?title=InstallationModes
+
+  What type of installation would you like to do? [N/s (Normal/Storage)] n
+
+  We found the following interfaces on your system:
+      * enp0s3 - 10.0.2.15/24
+      * enp0s8 - 192.168.56.3/24
+
+  Would you like to change the default network interface from enp0s3?
+  If you are not sure, select No. [y/N] y
+  What network interface would you like to use? enp0s8
+
+  Would you like to setup a router address for the DHCP server? [Y/n] y
+  What is the IP address to be used for the router on
+      the DHCP server? [10.0.2.2]192.168.56.2
+
+  Would you like DHCP to handle DNS? [Y/n] y
+  What DNS address should DHCP allow? [127.0.0.53] 192.168.56.2
+
+  Would you like to use the FOG server for DHCP service? [y/N] y
+
+  This version of FOG has internationalization support, would  
+  you like to install the additional language packs? [y/N] y
+
+  Using encrypted connections is state of the art on the web and we
+  encourage you to enable this for your FOG server. But using HTTPS
+  has some implications within FOG, PXE and fog-client and you want
+  to read https://wiki.fogproject.org/HTTPS before you decide!
+  Would you like to enable secure HTTPS on your FOG server? [y/N] n
+
+  Which hostname would you like to use? Currently is: fogserver-VirtualBox
+  Note: This hostname will be in the certificate we generate for your
+  FOG webserver. The hostname will only be used for this but won't be
+  set as a local hostname on your server!
+  Would you like to change it? If you are not sure, select No. [y/N] y
+  Which hostname would you like to use? FogServer
+
+   ######################################################################
+   #     FOG now has everything it needs for this setup, but please     #
+   #   understand that this script will overwrite any setting you may   #
+   #   have setup for services like DHCP, apache, pxe, tftp, and NFS.   #
+   ######################################################################
+   # It is not recommended that you install this on a production system #
+   #        as this script modifies many of your system settings.       #
+   ######################################################################
+   #             This script should be run by the root user.            #
+   #      It will prepend the running with sudo if root is not set      #
+   ######################################################################
+   #            Please see our wiki for more information at:            #
+   ######################################################################
+   #             https://wiki.fogproject.org/wiki/index.php             #
+   ######################################################################
+
+ * Here are the settings FOG will use:
+ * Base Linux: Debian
+ * Detected Linux Distribution: Ubuntu
+ * Interface: enp0s8
+ * Server IP Address: 192.168.56.3
+ * Server Subnet Mask: 255.255.255.0
+ * Server Hostname: FogServer
+ * Installation Type: Normal Server
+ * Internationalization: 1
+ * Image Storage Location: /images
+ * Using FOG DHCP: Yes
+ * DHCP router Address: 192.168.56.2
+
+
+ * Are you sure you wish to continue (Y/N) y
+ 
+ 
