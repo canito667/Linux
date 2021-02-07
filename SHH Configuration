@@ -44,3 +44,912 @@ Modificar archivo de configuracion (/etc/ssh/sshd_config)
               # Authentication:
 
               #LoginGraceTime 2m
+              *************************************************************************************************************************************************
+              Bloquea la autorisacion de conectar con la cuenta ROOT desde el lado cliente 
+              < Para cambiarlo hay que cambiar el parametro de PermitRootLogin colocando <<<< no >>>> >
+              
+              #PermitRootLogin prohibit-password
+              
+              *************************************************************************************************************************************************
+              #StrictModes yes
+              #MaxAuthTries 6
+              #MaxSessions 10
+
+              #PubkeyAuthentication yes
+
+              # Expect .ssh/authorized_keys2 to be disregarded by default in future.
+              #AuthorizedKeysFile	.ssh/authorized_keys .ssh/authorized_keys2
+
+              #AuthorizedPrincipalsFile none
+
+              #AuthorizedKeysCommand none
+              #AuthorizedKeysCommandUser nobody
+
+              # For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+              #HostbasedAuthentication no
+              # Change to yes if you don't trust ~/.ssh/known_hosts for
+              # HostbasedAuthentication
+              #IgnoreUserKnownHosts no
+              # Don't read the user's ~/.rhosts and ~/.shosts files
+              #IgnoreRhosts yes
+
+              # To disable tunneled clear text passwords, change to no here!
+              *************************************************************************************************************************************************
+              Una vez recibia una key desde el client SSH podemos modificar la opcion de conectar con contrasena y utlizar solo claves SSH
+              <Para activar la opcion PasswordAuthentication <<< no >>> debe estar configura de esta forma >
+              
+              #PasswordAuthentication yes
+              
+              *************************************************************************************************************************************************
+              #PermitEmptyPasswords no
+
+              # Change to yes to enable challenge-response passwords (beware issues with
+              # some PAM modules and threads)
+              ChallengeResponseAuthentication no
+
+              # Kerberos options
+              #KerberosAuthentication no
+              #KerberosOrLocalPasswd yes
+              #KerberosTicketCleanup yes
+              #KerberosGetAFSToken no
+
+              # GSSAPI options
+              #GSSAPIAuthentication no
+              #GSSAPICleanupCredentials yes
+              #GSSAPIStrictAcceptorCheck yes
+              #GSSAPIKeyExchange no
+
+              # Set this to 'yes' to enable PAM authentication, account processing,
+              # and session processing. If this is enabled, PAM authentication will
+              # be allowed through the ChallengeResponseAuthentication and
+              # PasswordAuthentication.  Depending on your PAM configuration,
+              # PAM authentication via ChallengeResponseAuthentication may bypass
+              # the setting of "PermitRootLogin without-password".
+              # If you just want the PAM account and session checks to run without
+              # PAM authentication, then enable this but set PasswordAuthentication
+              # and ChallengeResponseAuthentication to 'no'.
+              UsePAM yes
+
+              #AllowAgentForwarding yes
+              #AllowTcpForwarding yes
+              #GatewayPorts no
+              X11Forwarding yes
+              #X11DisplayOffset 10
+              #X11UseLocalhost yes
+              #PermitTTY yes
+              PrintMotd no
+              #PrintLastLog yes
+              #TCPKeepAlive yes
+              #PermitUserEnvironment no
+              #Compression delayed
+              #ClientAliveInterval 0
+              #ClientAliveCountMax 3
+              #UseDNS no
+              #PidFile /var/run/sshd.pid
+              #MaxStartups 10:30:100
+              #PermitTunnel no
+              #ChrootDirectory none
+              #VersionAddendum none
+
+              # no default banner path
+              #Banner none
+
+              # Allow client to pass locale environment variables
+              AcceptEnv LANG LC_*
+
+              # override default of no subsystems
+              Subsystem	sftp	/usr/lib/openssh/sftp-server
+
+              # Example of overriding settings on a per-user basis
+              #Match User anoncvs
+              #	X11Forwarding no
+              #	AllowTcpForwarding no
+              #	PermitTTY no
+              #	ForceCommand cvs server
+
+
+****************************************************************************************************************************************************************
+
+SSH Client con OpenSSH
+
+para conectar hacia un server SSH
+
+formato 
+
+ssh user@ip
+
+Creacion de una clave SSH.
+
+ssh-key
+
+Esta key estara guardada en /home/<user>/.ssh/id_rsa
+
+Para copiar esta clave en el servidor ssh se utiliza
+
+Check OK    scp /home/jox/.ssh/id_rsa.pub 192.168.0.16:/home/jox/id_rsa.pub
+
+Check no OK ssh-copy-id -i <Especifica un archivo> ~/.ssh/id_rsa.pub < Direccion ip a copiar la clave >
+
+**************************************************************************************************************************************************************
+
+Para copiar desde un servidor SSH
+scp reponses.txt jonathan@79.99.162.136:/home/jonathan
+
+
+
+**************************************************************************************************************************************************************
+**************************************************************************************************************************************************************
+**************************************************************************************************************************************************************
+**************************************************************************************************************************************************************
+**************************************************************************************************************************************************************
+
+Media 
+
+Qu'est ce que SSH et OpenSSH
+
+
+Secure Shell (SSH) est un programme mais aussi un protocole de communication sécurisé. Grâce à SSH, on peut se connecter à distance sur une machine, transférer des fichiers, si celle-ci dispose d'un serveur SSH,
+
+OpenSSH (OpenBSD Secure Shell) est un ensemble d'outils informatiques libres permettant des communications sécurisées sur un réseau informatique en utilisant le protocole SSH.
+
+Installation du serveur OpenSSH
+
+Pour installer le serveur ssh sur notre machine, installer le paquet openssh-server
+
+Gentoo et Calculate Linux :
+
+Copier vers le presse-papierCode BASH :
+
+emerge net-misc/openssh
+
+
+
+CentOS et Fedora :
+
+Copier vers le presse-papierCode BASH :
+
+dnf install openssh-server
+
+
+
+CentOS 7 et 6 :
+Copier vers le presse-papierCode BASH :
+
+yum install openssh-server
+
+
+
+Debian :
+
+Copier vers le presse-papierCode BASH :
+
+apt install openssh-server
+
+
+
+
+Configurer le service SSH
+
+Lancer le service au démarrage
+
+Gentoo (OpenRC) / Calculate Linux :
+
+Copier vers le presse-papierCode BASH :
+
+rc-update add sshd default
+/etc/init.d/sshd start
+
+
+
+Fedora et CentOS :
+
+Copier vers le presse-papierCode BASH :
+
+systemctl enable --now sshd.service
+
+
+
+Debian :
+
+Copier vers le presse-papierCode BASH :
+
+systemctl enable --now ssh.service
+
+
+
+
+Affiner la configuration de SSH
+
+Désactiver les connexions SSH en root
+
+Il est recommandé de ne pas permettre la connexion en root.
+
+Pour cela, éditer le fichier /etc/ssh/sshd_config et modifier cette ligne:
+
+Copier vers le presse-papierCode :
+PermitRootLogin no
+
+
+Si on souhaite se connecter en root directement, on peut n'autoriser que la connexion avec clé :
+
+Copier vers le presse-papierCode :
+PermitRootLogin prohibit-password
+
+
+Ne pas oublier de redémarrer SSH.
+
+
+Changer le port de SSH
+
+Je vous recommande de changer le port.
+
+Par exemple, utiliser le port 2222, éditer /etc/ssh/sshd_config :
+
+Copier vers le presse-papierCode BASH :
+
+Port 2222
+
+
+
+Ne pas oublier d'ajouter une exception pour le parefeu :) Exemple avec firewalld :
+
+Copier vers le presse-papierCode BASH :
+
+firewall-cmd --add-port=2222/tcp --permanent
+firewall-cmd --reload
+
+
+
+Si on utilise SELinux, on doit changer le booléen concerné :
+
+Copier vers le presse-papierCode BASH :
+
+semanage port -a -t ssh_port_t -p tcp 2222
+
+
+
+Redémarrer SSH pour prendre effet.
+
+
+Autoriser le SSHFS
+
+Il se peut que lorsque vous tentez de vous connecter en SSHFS sur votre seveur, celui-ci indique Connexion reset by peer.
+
+Pour cela, éditer le fichier /etc/ssh/sshd_config et modifier/ajouter cette ligne:
+
+Sous Gentoo :
+
+Copier vers le presse-papierCode :
+Subsystem       sftp    /usr/lib64/misc/sftp-server
+
+
+Chez CentOS, cela ressemble à
+
+Copier vers le presse-papierCode :
+Subsystem    sftp    /usr/libexec/openssh/sftp-server
+
+
+Ne pas oublier de relancer SSH
+
+
+Autoriser/Interdire des utilisateurs
+
+Il est possible d'autoriser une liste de certains utilisateurs à se connecter. Modifier ou ajouter cette ligne dans le sshd_config :
+
+Copier vers le presse-papierCode BASH :
+
+AllowUsers user1 user2 user3
+
+
+
+Il est possible de refuser la connexion que de certains utilisateurs. Modifier ou ajouter cette ligne dans le sshd_config :
+
+Copier vers le presse-papierCode BASH :
+
+DenyUsers user1 user2 user3
+
+
+
+Autoriser/Interdire des groupes
+
+Il est possible d'autoriser une liste de certains groupes à se connecter. Modifier ou ajouter cette ligne dans le sshd_config :
+
+Copier vers le presse-papierCode BASH :
+
+AllowGroups groupe1 groupe2
+
+
+
+Il est possible de refuser la connexion que de certains groupes. Modifier ou ajouter cette ligne dans le sshd_config :
+
+Copier vers le presse-papierCode BASH :
+
+DenyUsers groupe1 groupe2
+
+
+
+
+Afficher une bannière
+
+Si le serveur est public, on peut ajouter une bannière, une sorte de message affiché à la connexion.
+
+Exemple :
+
+Copier vers le presse-papierCode BASH :
+
+###############################################################################
+#                                                                             #
+#  WARNING : Unauthorized access to this system is forbidden and will be      #
+#  prosecuted by law. By accessing this system, you agree that your actions   #
+#  may be monitored if unauthorized usage is suspected.                       #
+#                                                                             #
+###############################################################################
+
+
+
+On décommente la ligne "Banner" dans le fichier /etc/ssh/sshd_config et on y place le nom du fichier de la bannière :
+
+Copier vers le presse-papierCode BASH :
+
+Banner /etc/banner
+
+
+
+On créé le fichier /etc/banner avec notre bannière dedans
+
+
+Directive Match
+
+Si on souhaite encore personnaliser certaines options dans SSh pour certains groupes, utilisateurs ou adresses, on peut utiliser la directive Match :
+
+Voici deux exemples.
+
+Autoriser l'accès root en fonction de certaines adresses :
+Copier vers le presse-papierCode BASH :
+
+Match Address 192.168.21.0/24
+    PermitRootLogin yes
+ 
+Match Address *
+    PermitRootLogin no
+
+
+
+Ou bien n'autoriser que quelques options pour un groupe particulier (CF Tuto SFTP) :
+Copier vers le presse-papierCode BASH :
+
+Match Group sftpusers
+    ChrootDirectory /sftp/%u
+    AllowTcpForwarding no
+    ForceCommand internal-sftp
+
+
+
+
+Ne pas oublier le parefeu
+
+Bien qu’automatiquement, lors de l'installation d'openssh, celui-ci ouvre le parefeu, vérifier, selon la distribution utilisée que le parefeu est bien ouvert sur le port 22 en TCP.
+
+Avec firewalld :
+
+Copier vers le presse-papierCode BASH :
+
+firewall-cmd --add-service=ssh --permanent
+firewall-cmd --reload
+
+
+
+
+Tester sa connexion ssh :
+
+En local
+
+Ouvrir une console, et tester de se connecter (dans mon exemple, avec l'utilisateur adrien) :
+
+Copier vers le presse-papierCode BASH :
+
+adrien@masupermachine ~ $ ssh adrien@127.0.0.1                                                                                                                                                                                                   
+Password:                                                                                                                                                                                                                                   
+Last login: Thu Jan 24 20:50:28 CET 2013 from 192.168.1.200 on pts/3                                                                                                                                                                        
+adrien@masupermachine ~ $  
+
+
+
+
+A distance
+
+Ouvrir une console sur un autre PC (on considère que l'IP de ma machine où est installée SSH est 192.168.1.101 :
+
+Copier vers le presse-papierCode BASH :
+
+adrien@masupermachine ~ $ ssh adrien@192.168.1.101                                                                                                                                                                                                   
+Password:                                                                                                                                                                                                                                   
+Last login: Thu Jan 24 20:50:28 CET 2013 from 192.168.1.200 on pts/3                                                                                                                                                                        
+adrien@masupermachine ~ $  
+
+
+
+Si on a changé le port :
+
+Copier vers le presse-papierCode BASH :
+
+ssh adrien@192.168.1.101 -p2222 
+
+
+
+Depuis Windows, on pourra utiliser PuTTY ou Bash dans Windows 10.
+
+
+Et si on parlait de clés ?
+
+Le mot de passe pour se connecter en SSH, c'est bien mais ... Si on se connectait avec une clé que seul notre ordinateur et le serveur en ont connaissance ?
+
+C'est une bonne alternative au mot de passe. Si le serveur est directement connecté à l'Internet, il est préférable, d'utiliser une paire de clés privées/publiques et d'interdire le mot de passe.
+
+Mais cela peut être pratique, pour ne pas saisir de mot de passe et se connecter cash au serveur (automatismes rsync par exemple).
+
+
+Générer la paire de clés
+
+Dans l'exemple qui suit, je vais générer la clé au format RSA avec une taille de 4096 bits :
+
+Copier vers le presse-papierCode BASH :
+
+ssh-keygen -t rsa -b 4096
+
+
+
+Il faut renseigner par la suite le nom du fichier, valider pour laisser par défaut dans /home/$USER/.ssh/id_rsa.
+
+Ensuite, on nous demande de saisir une passphrase. C'est une suite de caractères (une phrase mnémotechnique, qu'il faudra saisir à chaque connexion). Je ne vais pas en mettre.
+
+Ce n'est pas ANTI-SÉCURITÉ puisque sur la machine client ET le serveur devront s'authentifier mutuellement.
+
+Pour plus de sécurité, on peut utiliser ECDSA au lieu de RSA avec une taille de 384 bits :
+
+Copier vers le presse-papierCode BASH :
+
+ssh-keygen -t ecdsa -b 384
+
+
+
+Voire même on peut utiliser ed25519 :
+
+Copier vers le presse-papierCode BASH :
+
+ssh-keygen -t ed25519
+
+
+
+ecdsa et ed25519 : c'est de la cryptographie sur des courbes elliptiques. Retenez rapidement que c'est plus efficace et moins consommateur de ressources. Il y a plein d'infos sur le net à ce sujet.
+
+Voici ce que contient le fichier de clé publique sur notre client:
+
+Copier vers le presse-papierCode TEXT :
+
+adrien@client ~ $ cat .ssh/id_rsa.pub
+ssh-rsa AAAAB3Nz[...]dR/7L adrien@client
+
+
+
+
+Configurer le serveur
+
+
+Et maintenant ? Comment je configure mon serveur ?
+
+Et bien, la clé publique, précédemment générée est à copier coller sur le serveur, dans le fichier ~/.ssh/authorized_keys.
+
+Attention ! Le contenu du fichier ~/.ssh/id_rsa.pub doit tenir sur une seule et même ligne !
+
+Pour éviter les erreurs de frappe, si le client est un Linux, on peut transférer le fichier via cette commande:
+
+Copier vers le presse-papierCode BASH :
+
+ssh-copy-id adrien@serveur
+
+
+
+Sur notre serveur, nous obtenons ensuite ceci :
+
+Copier vers le presse-papierCode TEXT :
+
+adrien@serveur ~ $ cat .ssh/authorized_keys
+ssh-rsa AAAB3N[...]oe1 adrien@client
+
+
+
+Si plusieurs clients ont des accès au serveur, il y aura plusieurs lignes dans le fichier ~/.ssh/authorized_keys du serveur.
+
+Maintenant, on teste la connexion au serveur.
+
+Si c'est la première fois qu'on se connecte au serveur par ssh, avec notre client, il peut y avoir un avertissement. Valider par "Yes"
+
+Cf. exemple en dessous
+
+Nous sommes connectés.
+
+On ferme la connexion avec la commande exit et on tente de se connecter : RAS, rien à saisir !
+
+Copier vers le presse-papierCode TEXT :
+
+adrien@client ~ $ ssh adrien@192.168.1.101
+The authenticity of host '192.168.1.101 (192.168.1.101)' can't be established.
+ECDSA key fingerprint is d3:01:93:21:a4:37:24:d0:49:58:f2:57:67:7b:be:02.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.1.101' (ECDSA) to the list of known hosts.
+Last login: Thu Jan 24 19:05:59 CET 2013 on :0
+adrien@serveur ~ $ exit
+déconnexion
+Connection to 192.168.1.101 closed.
+adrien@client ~ $ ssh adrien@192.168.1.101
+Last login: Thu Jan 24 20:38:37 CET 2013 from 192.168.1.200 on pts/3
+adrien@serveur ~ $ 
+
+
+
+Et voila, notre client et notre serveur sont configurés.
+
+Les déclinaisons des commandes ssh (telles rsync, scp et sftp) bénéficient du système de clés privées/clés publiques.
+
+Si on est sur de notre coup, on peut désactiver les connexions par mot de passe à notre serveur pour n'autoriser que des connexions par clés.
+
+Ne faites cela que si vous êtes sûr de votre coup, sinon, il vous faudra accéder à la machine physique si vous perdez la clé (vol d'ordinateur client, destruction du disque dur ...) et que vous n'avez pas d'autres clients configurés.
+
+Pour cela, éditer le fichier /etc/ssh/sshd_config et passer la valeur PasswordAuthentication à no et UsePAM à no
+
+Recharger la configuration de ssh.
+
+
+Et si je ne veux plus qu'un client accède à mon serveur
+
+Et bien la réponse à cette question est simple, il suffit de supprimer la ligne correspondante dans le fichier ~/.ssh/authorized_keys du serveur.
+
+
+Infos pratiques côté Client
+
+~/.ssh/config : Configuration simple
+
+Je vais vous présenter quelque chose qui m'a simplifié la vie : les alias SSH.
+
+Si on a l'habitude de se connecter à plusieurs serveurs SSH, (noms d'hôtes différents, ports différents) et que vous avez parfois la flemme de taper toute la ligne :
+
+Copier vers le presse-papierCode BASH :
+
+ssh -p 5222 adrien@192.168.10.100
+
+
+
+Il est possible de créer des alias.
+
+Il suffit de créer le fichier ~/.ssh/config.
+
+Voici un exemple :
+
+Copier vers le presse-papierCode BASH :
+
+Host srv1
+  HostName 192.168.10.100
+  Port 5222
+  User adrien
+
+
+
+
+Ainsi, j'ai juste à taper en console ssh srv1 et cela est équivalent à ssh -p 5222 adrien@192.168.10.100.
+
+~/.ssh/config : Configuration avancée
+
+Alias de tunnel
+
+Il est même possible de créer un alias tunnel.
+
+Je vous montre un exemple, puis je vous explique :
+
+Copier vers le presse-papierCode BASH :
+
+Host webmin
+  HostName 192.168.1.11
+  Port 22
+  User adrien
+  LocalForward 8080 192.168.1.11:10000
+ 
+
+
+
+Quand je fais faire ssh webmin, ça va m'ouvrir un tunnel SSH entre mon PC et le serveur ayant l'IP 192.168.1.11.
+
+On créé donc un tunnel SSH, qui va "relier" le port 8080 de ma machine sur le port 10000 de la machine distante.
+
+Si le serveur n'a que le pot 22 d'ouvert, c'est intéressant. Car je peux accéder à webmin (qui écoute sur le port 10000) maintenant, avec le navigateur sur mon PC à l'adresse https://127.0.0.1:8080 .
+
+
+Tunnels et redirection de ports
+
+Redirection locale de port
+
+L'option -L : locale pour rediriger un port distant vers une destination (machine) locale
+
+La syntaxe de la commande :
+
+Copier vers le presse-papierCode BASH :
+
+ssh machine-distante -L port-local:HOSTNAME:port-distant 
+
+
+
+Pour expliquer je vais prendre un cas concret :
+
+Je suis sur Internet avec ma machine (client), et j'ai un accès en SSH sur un serveur (srvssh). Ce serveur est dans le même réseau qu'un serveur web (srvweb avec une IP 192.169.1.50). Ce serveur Web n'est pas joignable directement depuis Internet.
+
+On peut se connecter sur le srvssh en faisant une redirection de port 80 du srvweb sur un port de notre machine cliente :
+
+Copier vers le presse-papierCode BASH :
+
+ssh srvssh -L 1234:192.168.1.50:80
+
+
+
+Ensuite, en saisissant sur la machine cliente dans un navigateur web http://127.0.0.1:1234 je tombe sur mon serveur web :)
+
+Interdire l'ouverture d'un shell avec une redirection de port
+
+Si vous lancez cette commande sur un de vos serveurs pour effectuer un tunnel, il est possible d'utiliser l'option -N qui permet de ne pas ouvrir un shell. Pour empêcher avec l'utilisateur concerné d'ouvrir un shell, sur le serveur distant, il est possible après coup de modifier la ligne de la clé dans le fichier .ssh/authorized_keys en indiquant devant :
+
+Copier vers le presse-papierCode BASH :
+
+no-pty,no-X11-forwarding,permitopen="localhost:1234",command="/bin/echo interdit-de-lancer-un-shell" ssh-rsa......
+
+
+
+Bien sûr, assurez-vous de pouvoir ouvrir un shell avec un autre utilisateur ou un autre moyen !
+Il est possible par exemple, pour le tunnel, d'utiliser un utilisateur "tunnel" sur le serveur distant !
+
+Redirection distante de port
+
+L'option -R distante (remote) pour rediriger un port local vers une destination (machine) distante
+
+La syntaxe de la commande :
+
+Copier vers le presse-papierCode BASH :
+
+ssh -R port-distant:HOSTNAME:port-local  machine-distante
+
+
+
+Pour expliquer je vais prendre un cas concret :
+
+J'ai un serveur derrière un pare-feu (nommé srvssh) et j'ai un serveur à la maison (srvmaison) qui a le SSH accessible sur Internet. Je peux donc lancer depuis srvssh cette commande :
+
+Copier vers le presse-papierCode BASH :
+
+ssh -R 1234:localhost:22 srvmaison
+
+
+
+Ainsi depuis la maison, sur le serveur concerné, si je tape
+
+Copier vers le presse-papierCode BASH :
+
+ssh user-srvssh@localhost -p1234 
+
+
+
+Le mot de passe du serveur srvssh sera demandé et on sera connecté.
+
+Très pratique pour ouvrir un tunnel inverse :)
+
+
+Redirection dynamique de port (Proxy SOCKS)
+
+L'option -D dynamique pour un transfert de port dynamique basé sur SOCKS.
+
+La syntaxe :
+
+Copier vers le presse-papierCode BASH :
+
+ssh -D port serveur-distant
+
+
+
+Pour expliquer je vais prendre un cas concret :
+
+C'est assez utile si on veut naviguer via un proxy SOCKS. On est connecté sur un point d'accès Wi-Fi public avec notre PC. Tout le flux est potentiellement non sécurisé et peut être modifié.
+
+On peut alors, si on dispose d'un serveur SSH accessible (chez soi par exemple) se connecter via la commande :
+
+Copier vers le presse-papierCode BASH :
+
+ssh -D 8080 srvmaison
+
+
+
+Dans Firefox on va dans les options réseau, et on sélectionne Configuration Manuelle du proxy et dans Hôte SOCKS on renseigne 127.0.0.1 et comme port 8080 :
+
+firefox_socks
+
+Le trafic web passe par notre tunnel SSH (sécurisé depuis le PC client jusqu’à srvmaison) puis sort par le modem du réseau de srvmaison. 
+
+1
+
+SSH Server con OpenSSH
+
+2
+
+​
+
+3
+
+Instalacion
+
+4
+
+​
+
+5
+
+sudo apt-get instal openssh-server
+
+6
+
+​
+
+7
+
+Configuracion avanzada SSH-server
+
+8
+
+​
+
+9
+
+Modificar archivo de configuracion (/etc/ssh/sshd_config)
+
+10
+
+​
+
+11
+
+              # $OpenBSD: sshd_config,v 1.103 2018/04/09 20:41:22 tj Exp $
+
+12
+
+​
+
+13
+
+              # This is the sshd server system-wide configuration file.  See
+
+14
+
+              # sshd_config(5) for more information.
+
+15
+
+​
+
+16
+
+              # This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
+
+17
+
+​
+
+18
+
+              # The strategy used for options in the default sshd_config shipped with
+
+19
+
+              # OpenSSH is to specify options with their default value where
+
+20
+
+              # possible, but leave them commented.  Uncommented options override the
+
+21
+
+              # default value.
+
+22
+
+​
+
+23
+
+              Include /etc/ssh/sshd_config.d/*.conf
+
+24
+
+              
+
+25
+
+              *************************************************************************************************************************************************
+
+26
+
+              #Port 22  (Para cambiar el puerto)
+
+27
+
+              *************************************************************************************************************************************************
+
+28
+
+              
+
+29
+
+              #AddressFamily any
+
+30
+
+              #ListenAddress 0.0.0.0
+
+31
+
+              #ListenAddress ::
+
+32
+
+​
+
+33
+
+              #HostKey /etc/ssh/ssh_host_rsa_key
+
+34
+
+              #HostKey /etc/ssh/ssh_host_ecdsa_key
+
+35
+
+              #HostKey /etc/ssh/ssh_host_ed25519_key
+
+36
+
+​
+
+37
+
+              # Ciphers and keying
+
+38
+
+              #RekeyLimit default none
+
+39
+
+​
+
+40
+
+              # Logging
+
+41
+
+              #SyslogFacility AUTH
+
+42
+
+              #LogLevel INFO
+
+43
+
+​
+
+44
+
+              # Authentication:
+
+45
+
+​
+
+46
+
+              #LoginGraceTime 2m
