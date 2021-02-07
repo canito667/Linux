@@ -1,0 +1,7 @@
+Aumentar Disco virtual ...
+
+VBoxManage modifymedium [Path Disco .VDI] --resize [tamano a re definir] 
+
+Ejemplo:
+
+  VBoxManage modifymedium [Path Disco .VDI] /home/jox/VirtualBox\ VMs/Xubuntu\ FogServer/Xubuntu.vdi --resize 64400
