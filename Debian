@@ -1,0 +1,104 @@
+*** Red *******************************************************************************************************************************************************
+
+ifconfig 
+route -n (gateway) 
+netstat 
+
+https://www.sysadmit.com/2018/09/linux-como-saber-gateway-puerta-de-enlace.html
+
+CAMBIAR DIRRECION IP FIJA 
+Modifcar Archivo
+
+sudo nano /etc/netplan/00-installer-config.yaml
+
+Configuracion 
+1)
+network:
+  version: 2
+  ethernets:
+    enp0s3:                         (nombre Network)
+      addresses: [192.168.0.41/24]  (ip / mask)
+      gateway4: 192.168.0.1         (gateway)
+      nameservers:
+        addresses: [192.168.0.1, 8.8.8.8]     (dns, servidores)
+
+2) Comprobamos que no existen errores con el siguiente comando:
+sudo netplan try
+
+3) Si todo es correcto aplicamos los cambios con el siguiente comando:
+sudo netplan apply
+
+4) Reiniciamos 
+sudo reboot
+
+*** DHCP ****************************************************************************************************************************************************
+
+network:
+  ethernets:
+    enp0s3:
+      dhcp4 : true
+  version2:  
+
+
+
+
+
+**** Copiar Archivos con SCP en SSH *****************************************************************************************************************************
+
+La sintaxis general de uso es la siguiente:
+
+scp [OPCION] [usuario@]SRC_HOST:]archivo1 [usuario@] HOST_DESTINO:]archivo2
+
+Copiar un archivo de forma sencilla, por ejemplo, al directorio Home usaremos lo siguiente:
+scp archivo.extension usuario@dominio.com:/home/usuario
+
+Podemos copiar un archivo de servidor a servidor ejecutando:
+scp usuario1@dominio1.com:/home/usuario1/archivo.extension usuario2@dominio2.com:/home/usuario2/
+
+
+Si deseamos copiar un directorio completo con scp podemos ejecutar la siguiente sintaxis:
+scp -r /home/usuario/carpeta usuario@dominio.com:/home/usuario
+
+Finalmente podemos limitar el ancho de banda a usar con el parámetro “l” así:
+scp -l limite usuario@dominio.com:/home/usuario/archivo.extension Documentos
+
+Para copiar desde un servidor SSH
+scp reponses.txt jonathan@79.99.162.136:/home/jonathan
+
+***************************************************************************************************************************************************************
+Servicios 
+
+
+ver estado de un servicio       << systemctl status < Nom service > >>
+ver si el servicio esta activo  << systemctl is-active <Nom Service > >>
+Ver todos los servicios         << systemctl list-unit-files --type service --all >>
+Reiniciar un servicio           << sudo service ssh restart >>
+
+Ver informacion de todos los servicios              << systemctl list-units --type service --all >>
+Informacion de servicios activos                    << systemctl list-units --type service >>
+Revisa los servicios con problemas al iniciar el OS << systemctl list-units --state=failed >>
+
+PARA REVISAR LOS SERVICIOS EN UNA INSTERFAZ FRAFICA HAY QUE INSTALAR 
+sudo apt-get install systemd-ui
+systemadm
+
+
+parar un proceso 
+
+ps -A | grep <nombre del proceso>
+suite d'obtenir le PID 
+kill -9 [PID]
+
+** BUSQUEDA ************************
+
+Permite encotrar el ejecutable de una aplicacion 
+which < Nombre de la aplicacion >
+
+** LIMPIAR CACHE DNS ***************
+
+Muestra el cache dns 
+sudo systemd-resolve --statistics
+
+Limpia cache DNS 
+sudo systemd-resolve --flush-caches
+
