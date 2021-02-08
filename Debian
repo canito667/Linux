@@ -11,7 +11,7 @@ Modifcar Archivo
 
 sudo nano /etc/netplan/00-installer-config.yaml
 
-Configuracion 
+Configuracion MANUAL
 1)
 network:
   version: 2
