@@ -4,4 +4,4 @@ VBoxManage modifymedium [Path Disco .VDI] --resize [tamano a re definir]
 
 Ejemplo:
 
-  VBoxManage modifymedium [Path Disco .VDI] /home/jox/VirtualBox\ VMs/Xubuntu\ FogServer/Xubuntu.vdi --resize 64400
+sudo VBoxManage modifymedium /home/jox/VirtualBox\ VMs/Xubuntu\ FogServer/Xubuntu.vdi --resize 102400
