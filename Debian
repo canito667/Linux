@@ -102,3 +102,10 @@ sudo systemd-resolve --statistics
 Limpia cache DNS 
 sudo systemd-resolve --flush-caches
 
+*** PRIOVILEGIOS ********************************************************************************
+
+CAMBIAR PRIVILEGIOS DE GRUPO  Y USUSARIO
+
+https://lignux.com/como-cambiar-los-privilegios-o-propietario-de-archivos-y-carpetas-en-gnu-linux/
+
+
