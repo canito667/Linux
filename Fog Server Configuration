@@ -173,3 +173,351 @@ CONFUGUARTION CON DHCP VIRTUAL BOX *
  * Are you sure you wish to continue (Y/N) y
  
  
+ 
+ 
+ 
+ 
+ proxy dhcp configurationn 
+ 
+ Usar FOG con un servidor DHCP no modificable / Usar FOG sin servidor DHCP
+
+Nota:
+
+Este artículo es de calidad y se puede seguir, sin embargo, se escribe un nuevo artículo en el enlace a continuación que incluye soporte UEFI.
+
+Nuevo artículo: ProxyDHCP con dnsmasq
+Contenido
+
+    1 Resumen
+    2 Cómo funciona ProxyDHCP
+    3 Medio ambiente
+    4 Instalación y configuración
+    5 configuraciones de DNSMASQ para iPXE
+    6 pasos adicionales para 12.04.4, 12.04.5, 14.04, 14.10
+    7 Sirviendo ProxyDHCP a múltiples subredes
+    8 referencias
+    9 de Solución problemas
+    10 Información adicional
+
+Visión general
+
+Esto combina FOG con un servidor proxyDHCP. Lo que hace un servicio proxyDHCP es escuchar las solicitudes de DHCP y responder a los clientes que se identifican como clientes PXE. Deja la función de asignar direcciones IP a los otros servidores DHCP, pero proporciona la información necesaria para que el cliente pueda arrancar PXE. ProxyDHCP es una solución para aquellos de ustedes que están trabajando con un servidor DHCP no modificable o desean evitar la molestia de editar el servidor DHCP ya existente, o incluso como una solución de imágenes portátil.
+How ProxyDHCP works
+
+    When a PXE client boots up, it sends a DHCP Discover broadcast on the network, which includes a list of information the client would like from the DHCP server, and some information identifying itself as a PXE capable device.
+    A regular DHCP server responds with a DHCP Offer, which contains possible values for network settings requested by the client.Usually a possible IP address, subnet mask, router (gateway) address, dns domain name, etc.
+    Because the client identified itself as a PXEClient, the proxyDHCP server also responds with a DHCP Offer with additional information, but not IP address info. It leaves the IP address assigning to the regular DHCP server. The proxyDHCP server provides the next-server-name and boot file name values, which is used by the client during the upcoming TFTP transaction.
+    The PXE Client responds to the DHCP Offer with a DHCP Request, where it officially requests the IP configuration information from the regular DHCP server.
+    The regular DHCP server responds back with an ACK (acknowledgement), letting the client know it can use the IP configuration information it requested.
+    The client now has its IP configuration information, TFTP Server name, and boot file name and it initiate a TFTP transaction to download the boot file.
+
+Environment
+
+Tested working with:
+OS Version 	FOG Version
+Ubuntu 10.04 LTS x64 	Fog 0.29
+Ubuntu 10.04 LTS x32,x64 	Fog 0.32, Fog 1.0.1, Fog 1.1.0
+Ubuntu 11.04 x32, x64 	Diente 0.32, Diente 1.0.1, Diente 1.1.0
+Ubuntu 12.04, 12.10 LTS x32, x64 	Diente 0.32, Diente 1.0.1, Diente 1.1.0, Diente 1.2.0
+(k) Ubuntu 13.04, 13.10 x32, x64 	Diente 0.32, Diente 1.0.1, Diente 1.1.0, Diente 1.2.0
+(k) Ubuntu 14.04, 14.10 x32, x64 	Niebla 1.1.0, Niebla 1.2.0
+
+    dnsmasq
+    Servidor LTSP, más documentación en Ubuntu LTSP / ProxyDHCP . 
+
+Instalación y configuración
+
+    Primero instale el sabor de Linux deseado
+    Instale FOG (use las instrucciones en el manual del usuario wiki)
+    Asegúrese de realizar una instalación normal del servidor, no configure una dirección de enrutador DHCP o una dirección de servidor DNS, tampoco use FOG como servidor DHCP.
+    Si establece una contraseña de MySQL, asegúrese de cambiarla en /var/www/fog/commons/config.php y también en /opt/fog/service/etc/config.php
+    Edite / etc / export para que se vea así:
+
+    /images                        *(ro,async,no_wdelay,insecure_locks,no_root_squash,insecure)
+    /images/dev                    *(rw,async,no_wdelay,no_root_squash,insecure)
+
+    Instale dnsmasq usando:
+
+    sudo apt-get install dnsmasq
+
+    Cree /etc/dnsmasq.d/ltsp.conf usando la siguiente configuración, modifique según sea necesario:
+
+    # Sample configuration for dnsmasq to function as a proxyDHCP server,
+    # enabling LTSP clients to boot when an external, unmodifiable DHCP
+    # server is present.
+    # The main dnsmasq configuration is in /etc/dnsmasq.conf;
+    # the contents of this script are added to the main configuration.
+    # You may modify the file to suit your needs.
+
+    # Don't function as a DNS server:
+    port=0
+
+    # Log lots of extra information about DHCP transactions.
+    log-dhcp
+
+    # Dnsmasq can also function as a TFTP server. You may uninstall
+    # tftpd-hpa if you like, and uncomment the next line:
+    # enable-tftp
+
+    # Set the root directory for files available via FTP.
+    tftp-root=/tftpboot
+
+    # The boot filename.
+    dhcp-boot=pxelinux.0
+
+    # rootpath option, for NFS
+    dhcp-option=17,/images
+
+    # kill multicast
+    dhcp-option=vendor:PXEClient,6,2b
+
+    # Disable re-use of the DHCP servername and filename fields as extra
+    # option space. That's to avoid confusing some old or broken DHCP clients.
+    dhcp-no-override
+
+    # PXE menu.  The first part is the text displayed to the user.  The second is the timeout, in seconds.
+    pxe-prompt="Press F8 for boot menu", 3
+
+    # The known types are x86PC, PC98, IA64_EFI, Alpha, Arc_x86,
+    # Intel_Lean_Client, IA32_EFI, BC_EFI, Xscale_EFI and X86-64_EFI
+    # This option is first and will be the default if there is no input from the user.
+    pxe-service=X86PC, "Boot from network", pxelinux
+
+    # A boot service type of 0 is special, and will abort the
+    # net boot procedure and continue booting from local media.
+    pxe-service=X86PC, "Boot from local hard disk", 0
+
+    # If an integer boot service type, rather than a basename is given, then the
+    # PXE client will search for a suitable boot service for that type on the
+    # network. This search may be done by multicast or broadcast, or direct to a
+    # server if its IP address is provided.
+    # pxe-service=x86PC, "Install windows from RIS server", 1
+
+    # This range(s) is for the public interface, where dnsmasq functions
+    # as a proxy DHCP server providing boot information but no IP leases.
+    # Any ip in the subnet will do, so you may just put your server NIC ip here.
+    # Since dnsmasq is not providing true DHCP services, you do not want it
+    # handing out IP addresses.  Just put your servers IP address for the interface
+    # that is connected to the network on which the FOG clients exist.
+    # If this setting is incorrect, the dnsmasq may not start, rendering
+    # your proxyDHCP ineffective.
+    dhcp-range=192.168.1.10,proxy
+
+    # This range(s) is for the private network on 2-NIC servers,
+    # where dnsmasq functions as a normal DHCP server, providing IP leases.
+    # dhcp-range=192.168.0.20,192.168.0.250,8h
+
+    # For static client IPs, and only for the private subnets,
+    # you may put entries like this:
+    # dhcp-host=00:20:e0:3b:13:af,10.160.31.111,client111,infinite
+
+    Reinicie dnsmasq con
+
+    sudo service dnsmasq restart
+
+Nota: Después de que todo funcione, puede cambiar el tiempo de espera a 0 en la línea:
+
+pxe-prompt="Press F8 for boot menu", 3
+
+Configuración de DNSMASQ para iPXE
+
+Esta información pertenece a FOG 0.33 y al nuevo método de arranque iPXE.
+
+Para continuar usando dnsmasq para distribuir direcciones IP y para ayudar a encontrar el archivo de inicio, es necesario realizar algunos cambios para forzar que el archivo de inicio cargue el archivo de inicio iPXE.
+
+*** PRIMERO *** Actualice el esquema navegando a su página de administración de niebla e instale la actualización.
+
+Realice los siguientes cambios en su archivo ltsp.conf
+
+# Don't function as a DNS server:
+port=0
+
+# Log lots of extra information about DHCP transactions.
+log-dhcp
+
+# Dnsmasq can also function as a TFTP server. You may uninstall
+# tftpd-hpa if you like, and uncomment the next line:
+# enable-tftp
+
+# Set the root directory for files available via FTP.
+tftp-root=/tftpboot
+
+# The boot filename, Server name, Server Ip Address
+dhcp-boot=undionly.kpxe,,x.x.x.x
+
+# rootpath option, for NFS
+#dhcp-option=17,/images
+
+# kill multicast
+#dhcp-option=vendor:PXEClient,6,2b
+
+# Disable re-use of the DHCP servername and filename fields as extra
+# option space. That's to avoid confusing some old or broken DHCP clients.
+dhcp-no-override
+
+# PXE menu.  The first part is the text displayed to the user.  The second is the timeout, in seconds.
+pxe-prompt="Press F8 for boot menu", 3
+
+# The known types are x86PC, PC98, IA64_EFI, Alpha, Arc_x86,
+# Intel_Lean_Client, IA32_EFI, BC_EFI, Xscale_EFI and X86-64_EFI
+# This option is first and will be the default if there is no input from the user.
+pxe-service=X86PC, "Boot from network", undionly
+
+# A boot service type of 0 is special, and will abort the
+# net boot procedure and continue booting from local media.
+#pxe-service=X86PC, "Boot from local hard disk", 0
+
+# If an integer boot service type, rather than a basename is given, then the
+# PXE client will search for a suitable boot service for that type on the
+# network. This search may be done by multicast or broadcast, or direct to a
+# server if its IP address is provided.
+# pxe-service=x86PC, "Install windows from RIS server", 1
+
+# This range(s) is for the public interface, where dnsmasq functions
+# as a proxy DHCP server providing boot information but no IP leases.
+# Any ip in the subnet will do, so you may just put your server NIC ip here.
+# Since dnsmasq is not providing true DHCP services, you do not want it
+# handing out IP addresses.  Just put your servers IP address for the interface
+# that is connected to the network on which the FOG clients exist.
+# If this setting is incorrect, the dnsmasq may not start, rendering
+# your proxyDHCP ineffective.
+dhcp-range=10.0.0.10,proxy
+
+# This range(s) is for the private network on 2-NIC servers,
+# where dnsmasq functions as a normal DHCP server, providing IP leases.
+# dhcp-range=192.168.0.20,192.168.0.250,8h
+
+# For static client IPs, and only for the private subnets,
+# you may put entries like this:
+# dhcp-host=00:20:e0:3b:13:af,10.160.31.111,client111,infinite
+
+Guarde su archivo y reinicie su servicio dnsmasq con el siguiente comando:
+
+sudo service dnsmasq restart
+
+Cree un enlace simbólico para el archivo undionly.kpxe para que dnsmasq pueda encontrarlo.
+
+cd /tftpboot
+sudo ln -s undionly.kpxe undionly.0
+
+O
+
+cd /tftpboot
+cp undionly.kpxe undionly.0
+
+Pasos adicionales para 12.04.4, 12.04.5, 14.04, 14.10
+
+En concreto, al iniciar DNSMASQ, recibe el siguiente error:
+
+dnsmasq: failed to create listening socket for port 53: Address already in use failed!
+
+Si está utilizando la versión 12.04.4, 12.04.5, 14.04, 14.10 de Ubuntu, dnsmasq-base ya está instalado en su sistema y en uso por el administrador de red.
+
+Si intenta iniciar el servicio dnsmasq después de la instalación, se producirá un error, el error mencionado anteriormente. Para corregir este error:
+
+    Abra el terminal y emita el siguiente comando:
+
+    sudo nano /etc/NetworkManager/NetworkManager.conf
+
+    Quita la línea
+
+    dns=dnsmasq
+
+    Ahora necesitamos reiniciar el servicio de red.
+
+    sudo service network-manager restart
+
+    Esto debería resolver los problemas para hacer que dnsmasq se inicie.
+    Emita el siguiente comando:
+
+    sudo service dnsmasq restart
+
+Sirviendo ProxyDHCP a múltiples subredes
+
+Si está sirviendo ProxyDHCP a múltiples subredes, se deben realizar algunos cambios en sus conmutadores / enrutadores y en la configuración de su servidor.
+
+    Modifique su archivo /etc/dnsmasq.d/ltsp.conf agregando la opción de máscara de subred a la línea:
+
+    dhcp-range=192.168.1.10,proxy
+
+    para
+
+    dhcp-range=192.168.1.10,proxy,255.255.0.0
+
+    que sirva a todas las subredes 192.168.xx. Si usa direccionamiento 10.xxx, use la máscara de subred "255.0.0.0" (8 bits) y si está usando 172.16.xx, use la máscara de subred "255.240.0.0" (12 bits). Básicamente, configure la máscara de subred para que se cubran todas las subredes en las que debe responder ProxyDHCP. Si no hace esto, el servidor ProxyDHCP no responderá a las solicitudes de DHCP para hosts fuera de su propia subred.
+    Agregue un registro de IP Helper / DHCP Relay a su enrutador o conmutador para que las transmisiones DHCP se envíen a su servidor DHCP normal Y al servidor Fog.
+
+Referencias
+
+Reuní muchas de mis ideas a partir de las preguntas de la gente en los foros de FOG y la documentación de Ubuntu en el proxyDHCP LTSP servidor , así que gracias a ellos. Junkhacker: para obtener ayuda con la carga en cadena de iPXE jbsclm - por su trabajo para descubrir cómo cargar en cadena 0.33b con 0.32 pxelinux.0 http://forum.ipxe.org/showthread.php?tid=6077 - documentación sobre la carga en cadena con dnsmasq
+
+
+
+Solución de problemas
+
+A medida que ProxyDHCP intercepta las solicitudes de DHCP, inicia sus propias comprobaciones internas. Si no puede encontrar el archivo de inicio que se supone que está asignado, le dice al sistema solicitante que no hay nada que encontrar.
+
+Si encuentra el archivo, enviará la información normalmente.
+
+
+Mirando los paquetes.
+
+
+Usando TCPDump para capturar todo el tráfico que entra y sale de una interfaz en Linux:
+
+sudo tcpdump -w issue.pcap -i eth0
+
+
+Es posible que deba cambiar el nombre de la interfaz en el comando anterior si su interfaz tiene un nombre diferente. Este comando enumerará todas las interfaces disponibles; elija el correcto (no la interfaz de bucle de retorno):
+
+ip link show
+
+
+Ejecute el comando tcpdump anterior en la máquina FOG, luego inicie el host de destino remoto. Espere hasta que falle el host de destino remoto, luego detenga tcpdump usando ctrl + c . Luego, transfiera el archivo PCAP a su PC y examínelo con Wireshark .
+
+Puede obtener el archivo issue.pcap por varios medios. La forma más básica es colocar el archivo pcap dentro del directorio / tftpboot (o guardarlo allí) y luego usar TFTP para transferir el archivo a una máquina con Windows.
+
+Esto guardaría el archivo en su directorio / tftpboot, pero aún necesita especificar la interfaz correcta:
+
+sudo tcpdump -w /tftpboot/issue.pcap -i eth0
+
+Luego, en una máquina con Windows, emitiría este comando para recuperar el archivo a través de TFTP:
+
+tftp –i x.x.x.x get issue.pcap
+
+
+Obviamente, necesita el componente TFTP de Windows instalado y debe apagar el firewall de Windows. Los detalles sobre esas cosas se pueden encontrar aquí:
+
+Troubleshoot_TFTP
+
+Si su computadora de escritorio en la que desea obtener el archivo es Linux, obtener el archivo de captura es mucho más fácil. Simplemente puede usar SCP así desde su escritorio:
+
+scp username@x.x.x.x:/tftpboot/issue.pcap /home/YourUserName/Documents/issue.pcap
+
+
+Una vez que se complete la captura y haya abierto el archivo PCAP con Wireshark, utilice la dirección MAC del host de destino como filtro para el remitente y el receptor. El siguiente filtro de ejemplo básicamente hace esto: (Mostrar paquete si el MAC de envío es igual a xxxxxxx O el MAC de recepción es igual a xxxxxx)
+
+
+Filtro de ejemplo (cambiar las direcciones MAC):
+
+eth.dst == 00:0C:CC:76:4E:07 || eth.src == 00:0C:CC:76:4E:07
+
+Otros filtros de visualización útiles son bootp (DHCP), tftp y http, por ejemplo:
+
+bootp || tftp
+
+
+Usando el método y el filtro anteriores, así es ROTO como se ve una conversación de dnsmasq (ProxyDHCP) :
+
+Dnsmasq.png roto
+
+En este caso, el nombre del archivo de inicio dnsmasq no está configurado correctamente, el archivo de inicio no existe o TFTP no está configurado correctamente.
+Información adicional
+
+Un servidor ProxyDHCP también puede ayudar a lidiar con Clientes PXE que no funcionan con servidores DHCP y TFTP separados usando la opción 66 y 67 (Windows), o el siguiente servidor y nombre de archivo (Linux). Esto puede resolver situaciones en las que los clientes obtienen la dirección IP y el nombre de archivo del servidor tftp, pero tienen problemas con la transacción TFTP, como: PXE-T01: archivo no encontrado y otros errores.
+
+Esto ha resuelto con éxito problemas con:
+Dispositivo 	HILO
+Acer Iconia Tab w500p 	Adaptador Asix AX88772B USB a Fast Ethernet
+Compal JHL91 	Realtek RTL8139 
+ 
