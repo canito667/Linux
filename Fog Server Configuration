@@ -1,3 +1,7 @@
+https://pchanteux.wordpress.com/tutoriaux/fog/fog-partie-12-snapins/
+
+
+
 Execption firewall Windows
 
     netsh advfirewall firewall add rule name="Fog Client" dir=in action=allow program="C:\Program Files\FOG\FOGService.exe"
