@@ -1,3 +1,9 @@
+Execption firewall Windows
+
+    netsh advfirewall firewall add rule name="Fog Client" dir=in action=allow program="C:\Program Files\FOG\FOGService.exe"
+    netsh advfirewall firewall add rule name="Fog Service" dir=in action=allow program="C:\Program Files\FOG\FOGServiceConfig.exe"
+    netsh advfirewall firewall add rule name="Fog Tray" dir=in action=allow program="C:\Program Files\FOG\FOGTray.exe"
+
 Proxy DHCP FOG
 
 https://wiki.fogproject.org/wiki/index.php?title=Using_FOG_with_an_unmodifiable_DHCP_server/_Using_FOG_with_no_DHCP_server
