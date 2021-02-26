@@ -1,17 +1,23 @@
-Congiguaration php.ini
+FOG COMUNITY 
+
+https://forums.fogproject.org/confirm/149fe181-691e-4668-be91-5953b19d8698
+
+
+CONFIGURATION PHP.INI
+
 https://pchanteux.wordpress.com/tutoriaux/fog/fog-partie-12-snapins/
 
-Execption firewall Windows
+EXCEPTION FIREWALL WINDOWS 
 
     netsh advfirewall firewall add rule name="Fog Client" dir=in action=allow program="C:\Program Files\FOG\FOGService.exe"
     netsh advfirewall firewall add rule name="Fog Service" dir=in action=allow program="C:\Program Files\FOG\FOGServiceConfig.exe"
     netsh advfirewall firewall add rule name="Fog Tray" dir=in action=allow program="C:\Program Files\FOG\FOGTray.exe"
 
-Proxy DHCP FOG
+PROXY DHCP
 
 https://wiki.fogproject.org/wiki/index.php?title=Using_FOG_with_an_unmodifiable_DHCP_server/_Using_FOG_with_no_DHCP_server
 
-error fog CA certificate
+ERROR FOG CA CERTIFICATE
 
 https://forums.fogproject.org/topic/8613/error-while-install-fog-service-for-windows
 
