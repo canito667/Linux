@@ -115,4 +115,33 @@ CAMBIAR PRIVILEGIOS DE GRUPO  Y USUSARIO
 
 https://lignux.com/como-cambiar-los-privilegios-o-propietario-de-archivos-y-carpetas-en-gnu-linux/
 
+Si deseamos cambiar de propietario:
+sudo chown <usuario> (archivo o carpeta) 
+sudo chown <usuario> -R <carpeta> (carpeta y todo su contenido)
 
+Si queremos cambiar de Grupo:
+sudo chgrp <grupo> <carpeta> (archivo o carpeta)
+sudo chgrp <grupo> -R <carpeta> (carpeta y todo su contenido)
+
+Ahora vayamos un poco más rápido, si queremos cambiar de Usuario y Grupo a la vez emplearemos:
+sudo chown usuario:grupo <carpeta> (archivo o carpeta)
+sudo chown usuario:grupo -R <carpeta> (carpeta y todo su contenido)
+
+Si deseamos cambiar los Privilegios de algún directorio o capeta tenemos:
+sudo chmod <permisos> <opciones> <archivo o carpeta>
+sudo chmod +x foo.sh (dar permisos de ejecución)
+
+
+Recordemos que la parte de privilegios debemos de meter combinaciones validas, algunas de ellas son 664, 777, 764 ente otras.
+
+El primer dígito da los privilegios para el propietario.
+El segundo dígito da los privilegios para el grupo al que pertenece el propietario.
+El tercer dígito para los usuarios fuera del grupo del propietario.
+
+Literalmente estos privilegios se escriben:
+
+(-w-r-x) no lectura ni escritura ni ejecución.
+(-w-x+r) solo lectura.
+(+w+x+r) escritura y lectura.
+(+w+x+r) escritura, lectura y ejecución.
+(u) modificador de usuario (g) modificador de grupo (o) modificador para los “otros”.
