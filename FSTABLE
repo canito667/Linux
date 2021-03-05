@@ -1,0 +1,138 @@
+Source 
+https://eltallerdelbit.com/montar-unidades-de-red-windows-en-linux/
+
+IMPORTANTE para Montar/Mapear Unidades de Red en Linux:
+    
+Hemos de tener instalados en Linux los paquetes nfs-common y cifs-common (o cifs-utils)
+Finalmente, tras ver algunos posibles errores, editaremos el archivo /etc/fstab para mapear las unidades de red que deseamos 
+se conecten automáticamente al inicio de sesión en Linux.
+ 
+ARCHIVO /ETC/FSTAB
+
+Vamos comenzar con el archivo /etc/fstab y su contenido
+
+El archivo /etc/fstab incluye los dispositivos que han de ser montados y su punto de montaje, así como otras opciones; 
+por ejemplo si ese dispositivo ha de ser montado automáticamente o no, 
+el usuario que puede montarlo …etc
+ 
+En el archivo /etc/fstab incluiremos las unidades de red que queremos que se monten automáticamente cuando iniciemos sesión en nuestro sistema Linux:
+
+ejemplo para agreagar en el archivo fstab
+
+//192.168.0.186/[compartidolinux] [/media/compartidolinux] cifs [user=ubuntu,password=reverse],noexec,user,rw,nounix,iocharset=utf8 0 0
+
+Así hemos podido montar una carpeta comparida en Linux
+ 
+
+ 
+Como podemos ver, estamos incluyendo en texto plano las credenciales del usuario y password que se conectará a esa unidad de red compartida 
+(usuario que debe estar creado también en el Servidor de archivos Windows).
+Hemos de tener en cuenta que este archivo no está cifrado, así que el usuario y contraseña serán visibles.
+Si deseamos proteger los datos de usuario, usaremos un archivo .smbcredentials
+
+Esa opción, que realmente es la más segura, la veremos en otro momento.
+
+ 
+
+ 
+CONTINUAMOS:
+Montaremos el recurso compartidolinux, que se encuentra en el server Windows 192.168.0.186, en el directorio /media/compartidolinux
+ 
+Así que creamos el directorio /media/compartidolinux, y le otorgamos permisos:
+ 
+
+1
+2
+
+	
+
+mkdir /media/compartidolinux
+chmod 777 /media/compartidolinux
+
+ 
+directorio para montar recurso compartido y permisos directorio
+ 
+
+ 
+Y utilizamos el comando mount -a para montar todos los discos que aparecen en el archivo /etc/fstab
+ 
+Es posible que recibamos el error:
+
+mount: wrong fs type, bad option, bad superblock on //192.168.0.186/compartidolinux
+ 
+
+mount: wrong fs type, bad option, bad superblock
+ 
+
+Lo que ocurre en este caso es que nos falta instalar el paquete nfs-common, que es necesario para poder montar directorios de formato NTFS.
+
+ 
+
+instalar nfs-common
+ 
+
+ 
+Pero seguimos sin poder ver el recurso compartido correctamente montado al iniciar sesión, y recibimos el error:
+
+Mount: only root can mount
+ 
+
+Parece que nos falta algo más …
+
+ 
+Mount: only root can mount
+ 
+
+ 
+
+Y recordamos en este punto que, como decíamos al principio del post, es fundamental que tengamos instalado el paquete cifs-utils
+ 
+¿Qué es CIFS?
+
+ 
+CIFS (Common Internet File System Utilities), son utilidades comunes que nos servirán para montar en nuestro sistema de archivos Linux, recursos de redes disponibles en máquinas remotas.
+ 
+CIFS es el sucesor del protocolo SMB, con lo cual tenemos soporte para máquinas Windows.
+
+ 
+
+Así que vamos primero a comprobar si tenemos el paquete cifs-utils instalado. Lo comprobamos con:
+
+1
+
+	
+
+dpkg -l cifs-utils
+
+ 
+Y como no lo tenemos instalado todavía, recibimos la advertencia:
+
+dpkg-query: no se ha encontrado ningún paquete que corresponda con cifs-utils.
+
+ 
+dpkg -l cifs-utils
+ 
+
+ 
+Así que sabemos que el paquete cifs-utils no está instalado
+ 
+
+Y a continuación lo instalaremos con:
+
+1
+
+	
+
+sudo apt-get install cifs-utils
+
+ 
+
+ 
+
+Ahora ya podemos montar las unidades de nuevo con mount -a, y comprobamos cómo podemos acceder al recurso compartido.
+
+recurso compartido Windows montado en Linux
+ 
+conectar recurso compartido Windows en Linux
+ 
+Ahora ya sabemos cómo montar unidades de red de forma automática en Linux; incluso si son unidades de red provenientes de un sistema NTFS como un Servidor Windows.
