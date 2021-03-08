@@ -1,7 +1,6 @@
 CONFIGURATION FOG
 
-//10.19.20.2/SOFTWARE_BRASSART /media/NAS cifs 	user=j.espinoza,password=*=0{yK,noexec,user,rw,nounix,iocharset=utf8 0 0
-
+//10.19.20.2/SOFTWARE_BRASSART/ImagesFogRaspail /images cifs user=j.espinoza,password=*=0{yK,noexec,user,rw,nounix,iocharset=utf8 0 0
 
 Source 
 https://eltallerdelbit.com/montar-unidades-de-red-windows-en-linux/
