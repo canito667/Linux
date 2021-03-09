@@ -18,16 +18,27 @@ Modifcar Archivo
 
 sudo nano /etc/netplan/00-installer-config.yaml
 
-Configuracion MANUAL
-1)
+DHCP
+# This is the network config written by 'subiquity'
 network:
-  version: 2
   ethernets:
-    enp0s3:                         (nombre Network)
-      addresses: [192.168.0.41/24]  (ip / mask)
-      gateway4: 192.168.0.1         (gateway)
+    enp0s25:
+      dhcp4: true
+
+MANUAL
+ # version: 2
+network:
+  ethernets:
+    enp0s25:
+      addresses:
+      - 10.19.60.200/23
+      dhcp4: false
+      gateway4: 10.19.60.1
       nameservers:
-        addresses: [192.168.0.1, 8.8.8.8]     (dns, servidores)
+        addresses:
+        - 10.19.60.1
+        - 8.8.8.8
+  version: 2
 
 2) Comprobamos que no existen errores con el siguiente comando:
 sudo netplan try
