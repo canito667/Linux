@@ -1,2 +1,51 @@
 https://www.youtube.com/watch?v=LRh82RgD-Fc&ab_channel=Chinnaz
 
+SEE THE VERSION LINUX 
+
+# lsb_release -a
+
+ISTALLING SAMBA
+
+# sudo apt update
+# sudo apt install samba*
+
+SETTING UP SAMBA
+Creacion de un archivo para compartir 
+
+mkdir /home/sharefolder
+
+BACKUP FOLDER CONFIGUIRATION SAMBA 
+
+sudo cp /etc/samba/smb.conf /etc/samba.smb.conf.bck
+
+EDIT THE FOLDER 
+
+sudo nano /etc/samba/smb.conf
+
+ADD THE FOLLOWING LINES 
+
+[sharefolder]
+    comment = samba on ubuntu
+    path = /home/sharefolder
+    read only = no
+    writable = yes
+    
+    browsable = yes
+    
+SAVE THE FILE NEXT RESTART SAMBA 
+
+sudo service smbd restart
+
+WE NEDD TO SET UP A  SAMBA PASSWORD FOR OUR USER ACCOUNT 
+
+sudo smbpasswd -a username
+
+UPDATE THE FIREWALL RULE TO ALLOW SAMBA 
+
+sudo ufw allow samba 
+
+
+
+
+
+
