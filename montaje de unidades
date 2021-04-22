@@ -1,0 +1,183 @@
+https://blog.desdelinux.net/como-montar-una-particion-en-linux/
+
+ Preparativos para el montaje
+
+Antes de montar la partición, debemos crear una carpeta donde vamos a montarla. 
+Generalmente se suele hacer en /media/ (/mnt en algunas distribuciones), así que es recomendable que la creemos allí:
+
+sudo mkdir /media/lalala
+
+Donde lalala es el nombre que tendrá la carpeta, podemos asignarle el que queramos.
+
+Si el sistema de archivos de la partición que vamos a 
+montar es NTFS (usado por los sistemas operativos Windows NT, Windows 2000, Windows XP, Windows Media Center, 
+Windows 2003 Server, Windows Vista y Windows 2007 Server), 
+entonces se recomienda instalar el controlador ntfs-3g para poder tener soporte de escritura en esa partición:
+
+sudo aptitude install ntfs-3g
+
+Si, en cambio, el sistema de archivos es UFS2 (usado por la mayoría de los sistemas operativos basados en BSD, 
+como NetBSD, OpenBSD, FreeBSD y sus derivados), entonces antes de montar la partición tendremos que cargar en la memoria el módulo del kernel ufs:
+
+sudo modprobe ufs
+
+Para no tener que cargarlo cada vez que inicie el sistema, podemos editar el archivo /etc/modules:
+
+gksudo gedit /etc/modules
+
+Y añadir la siguiente línea antes de ‘loop’:
+
+ufs
+
+Montaje de la partición
+
+Ahora vamos a montar la partición en la carpeta creada. Esto significa que el contenido de la partición va a aparecer en esa carpeta. 
+El comando para montar discos y/o particiones es mount, y se usa de la siguiente manera:
+
+$ sudo mount -t sistema_archivos [-o opciones] /dev/particion carpeta_montaje
+
+Cabe aclarar que si ocurre algún error durante el montaje, no se pondrán en peligro los datos de la partición, simplemente no será montada.
+
+Parámetros
+
+El significado de los parámetros usados en el comando mount son los siguientes:
+
+    sistema_archivos: es el sistema de archivos de la partición; puede ser vfat (FAT16 y FAT32), ntfs (NTFS) o ufs (UFS y UFS2); 
+    hay otros posibles valores, pero no son tratados en este artículo. Si es ufs, entonces debemos indicar de manera obligatoria las
+    opciones ro y ufstype (este último en caso de ser UFS2).
+
+    opciones: son las opciones de montaje, puede tomar más de un valor, en ese caso los valores se separan con comas (,). 
+    Algunos posibles valores son defaults (valores por defecto), ro (Read Only, es decir, Solo Lectura) y 
+    ufstype (para especificar el tipo de sistema de archivos UFS, en caso de que se use este); si no se especifican opciones especiales, 
+    podemos escribir defaults, u obviar este parámetro por completo (quitando también el -o de adelante). 
+    En este artículo, usaremos este parámetro únicamente para el montaje de particiones UFS y UFS2, y para el montaje al 
+    inicio del sistema (véase el encabezado Montaje al inicio del sistema).
+
+    partición: es el identificador de la partición que vamos a montar; puede ser hdXY en caso de ser un disco IDE o ATA, o sdX,Y en caso de ser SATA; 
+    la X es la letra del disco rígido (a para el primero, b para el segundo, etc.) y la Y es el número de partición (1 para la primera, 2 para la segunda, etc.). 
+    Si queremos saber el nombre de las particiones que tenemos en el equipo, basta con ejecutar el siguiente comando:
+
+$ sudo fdisk -l
+
+    carpeta_montaje: es la carpeta donde se montará la partición, es decir, donde aparecerán los datos (archivos y carpetas) de la partición; 
+    en la mayoría de los casos se encuentra dentro de /media/, aunque puede estar en cualquier otro lugar (véase el encabezado Preparativos para el montaje).
+
+Ejemplos concretos
+
+Para montar una partición FAT16 o FAT32:
+
+sudo mount -t vfat /dev/particion /media/carpeta_montaje
+
+Para montar una partición NTFS:
+
+sudo mount -t ntfs /dev/particion /media/carpeta_montaje
+
+Para montar una partición UFS:
+
+sudo mount -t ufs -o ro /dev/particion /media/carpeta_montaje
+
+Para montar una partición UFS2:
+
+sudo mount -t ufs -o ro,ufstype=ufs2 /dev/particion /media/carpeta_montaje
+
+Para montar una partición donde está Ubuntu:
+
+sudo mount /dev/particion /media/carpeta_montaje
+
+Montaje al inicio del sistema
+
+Una vez que hayamos conseguido montar la partición, quedará montada mientras el sistema esté en marcha. Cuando reiniciemos o apaguemos el equipo, tendremos
+que volver a montar la partición. Si queremos que se monte cada vez que iniciamos el sistema, necesitaremos modificar el archivo /etc/fstab:
+
+$ sudo gedit /etc/fstab
+
+Aquí se ha usado gEdit, pero puede usarse cualquier editor de textos, como Nano o Vim. Conviene usar gksudo o kdesu en vez de sudo para iniciar un 
+editor en modo gráfico; el primero es para el escritorio GNOME y el segundo para KDE.
+
+Una vez abierto el archivo, tenemos que cambiar la línea que comience con el identificador de la partición que 
+hemos montado (/dev/hdXY o /dev/sdXY) por la siguiente:
+
+/dev/particion /media/carpeta_montaje sistema_archivos opciones 0 0
+
+Si no existe esa línea, la añadimos al final del archivo.
+
+Los argumentos son los mismos que cuando usamos el comando mount. Aquí, si en opciones no usamos ningún valor, tendremos que escribir defaults, 
+y nos quedaría algo así:
+
+/dev/particion /media/carpeta_montaje sistema_archivos defaults 0 0
+
+Si es una partición FAT16 o FAT32 y no nos funciona con defaults, podemos probar las siguientes opciones:
+
+auto,users,exec,umask=000
+
+defaults,rw,user,auto,umask=0
+
+Con esta última se están dando permisos de lectura, escritura y ejecucion a todos los usuarios. Si queremos restringir estos permisos solo a un grupo 
+particular de usuarios (por ejemplo: users), las opciones deben quedar así:
+
+defaults,rw,user,auto,umask=007,gid=grupo 0 0
+
+Donde grupo debe sustituirse por el grupo de usuarios, por ejemplo, users.
+Finalmente, si por cualquier motivo no se detectan bien algunos caracteres (como la letra ñ), debemos añadir la siguiente opción junto con las otras 
+utilizadas, para cambiar el mapa de caracteres:
+
+iocharset=utf8
+
+Por ejemplo, una línea podría quedar así:
+
+/dev/hda0 /media/hda0 vfat defaults,rw,user,auto,iocharset=utf8,umask=000 0 0
+
+Para montar todos los dispositivos listados en el archivo /etc/fstab tenemos que ejecutar el siguiente comando en una terminal:
+
+sudo mount -a
+
+Con esto ya tendemos montada nuestra partición cada vez que se inicie Ubuntu.
+
+Crear un lanzador a la partición
+
+Una vez que tenemos montada la partición, comprobamos que en ocasiones puede resultarnos incómodo acceder siempre a 
+la carpeta /media/hdXY (o a la que hayamos especificado), para solucionar esto podemos hacer dos cosas:
+
+    Crear un lanzador simbólico en nuestra carpeta home o en cualquier otra carpeta
+    Crear un ícono en el escritorio que nos dirija a la carpeta de montaje
+
+Lanzador simbólico en /home
+
+La primera opción es crear un lanzador simbólico (son como los accesos directos de Windows), por ejemplo en nuestra carpeta personal home. 
+Con ello conseguiremos acceder a la partición desde esta carpeta y sin duplicar la información.
+
+Escribimos la siguiente línea en la terminal:
+
+$ ln -s /media/carpeta_montaje /home/usuario/carpeta_destino
+
+Donde carpeta_montaje es la carpeta donde montamos la partición, usuario es el nombre de nuestro usuario en el sistema y carpeta_destino es el lanzador 
+simbólico que crearemos para que actúe como carpeta de montaje.
+
+Ícono en el escritorio
+
+Si lo que queremos es crear un ícono en el escritorio, debemos hacer lo siguiente:
+En GNOME
+
+    Desplegamos el menú contextual del escritorio (botón derecho del ratón)
+    Seleccionamos la opción Crear enlace
+    Escogemos el tipo Enlace
+    Rellenamos los campos en blanco con los datos requeridos
+    Aceptamos para que se cree el enlace
+
+En KDE
+
+    Desplegamos el menú contextual del escritorio (botón derecho del ratón)
+    Seleccionamos la opción Crear nuevo -> Enlace a dispositivo -> Disco duro
+    En la pestaña General, escribimos el nombre del ícono
+    En la pestaña Dispositivo, escribimos el identificador de la partición (/dev/hdXY)
+    Aceptamos para que se cree el enlace
+
+Desmontaje de la partición
+
+Si por cualquier motivo deseas desmontar la partición, no tienes más que escribir esto en terminal:
+
+sudo umount carpeta
+
+Donde carpeta es la ubicación de la carpeta donde está montada la partición (por ejemplo: /media/hdaX).
+
+Fuente: Guía Ubuntu
