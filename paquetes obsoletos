@@ -1,0 +1,8 @@
+Con un simple comando verificaremos si tenemos paquetes obsoletos: 
+
+# dpkg -l | grep -i ^rc
+
+Esto los listará, luego para eliminarlos con este comando: 
+
+# dpkg -l |grep -i ^rc | cut -d " " -f 3 | xargs dpkg --purge
+
