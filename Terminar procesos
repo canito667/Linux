@@ -1,0 +1,35 @@
+https://www.cyberciti.biz/faq/stop-process-ubuntu-linux-command/
+
+
+tool 
+gnome-system-monitor
+
+kill Command Line Option
+
+Busca PID de la aplicacion 
+$ ps aux | grep firefox
+
+$ kill -s 15 PID-HERE
+$ kill -s 15 2358
+
+OR send signal 9 (SIGKILL) which is used for forced termination to PID # 3553:
+$ kill -9 PID-HERE
+$ kill -9 3553
+
+pkill Command Line Option
+
+The pkill command allows you to kill process by its name, user name, group name, terminal, UID, EUID, and GID. 
+In this example, kill firefox process using pkill command for user vivek as follows:
+$ pkill -9 -u vivek firefox
+
+killall Command Line Option
+
+The killall command sends a signal to all processes. To terminate all httpd process (child and parent), enter:
+$ sudo killall -9 httpd
+
+OR
+$ sudo killall -9 apache2
+
+
+
+
