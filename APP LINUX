@@ -15,3 +15,10 @@ funciona en cualquier plataforma.
  
  Source    : https://www.balena.io/etcher
  Donwload  : https://github.com/balena-io/etcher/releases/download/v1.14.3/balenaEtcher-1.14.3-x64.AppImage
+ 
+Mensageria LINUX
+
+Mailspring
+
+Source     : https://snapcraft.io/mailspring
+Donwload   : sudo snap install mailspring
