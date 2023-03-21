@@ -1,0 +1,332 @@
+https://linuxhandbook.com/find-command-example
+
+
+Buscar comando en Linux
+
+La sintaxis general para el comando de búsqueda es:
+
+find [directory to search] [options] [expression]
+
+[Permítanme tomar un ejemplo simple]
+
+find . -type f -name myfile
+
+
+[Puede buscar archivos y directorios por su nombre]
+
+find . -name SEARCH_NAME
+
+[El siguiente ejemplo encuentra archivos y directorios llamados mystuff]
+
+abhishek@LHB:~/Examples$ find -name mystuff
+./new/mystuff
+./mystuff
+
+[Si solo desea buscar archivos, especifique el tipo de archivo -f]
+
+find . -type f -name SEARCH_NAME
+
+
+
+FOR MORE ... 
+....
+.....
+......
+
+El orden de tipo y nombre no importa. Tome el ejemplo anterior y busque solo archivos:
+
+abhishek@LHB:~/Examples$ find -type f -name mystuff
+./mystuff
+
+Si solo desea buscar directorios, especifique el tipo -d:
+
+find . -type d -name SEARCH_NAME
+
+En el archivo anterior, busque directorios solamente:
+
+abhishek@LHB:~/Examples$ find -type d -name mystuff
+./new/mystuff
+
+Ejecutar una búsqueda que no distinga entre mayúsculas y minúsculas
+
+De forma predeterminada, el comando de búsqueda distingue entre mayúsculas y minúsculas. Puede ejecutar una búsqueda que no distingue entre mayúsculas y minúsculas con el nombre dado usando -inameen lugar de -name.
+
+find . -type f -iname SEARCH_NAME
+
+Puedes usarlo con type dtambién.
+
+abhishek@LHB:~/Examples$ find -iname mystuff
+./new/mystuff
+./MyStuff
+./mystuff
+
+Captura de pantalla de los tres ejemplos anteriores:
+Ejemplos simples del comando de búsqueda
+Buscar archivos por su extensión (importante)
+
+Uno de los usos más comunes del comando de búsqueda es encontrar archivos de un tipo específico o debería decir una extensión específica.
+
+Por ejemplo, supongamos que desea buscar todos los archivos C++ en los directorios actuales. Los archivos C++ terminan con la extensión .cpp, por lo que puede buscarlos así:
+
+find . -type f -name "*.cpp"
+
+De esta manera, le dices al comando find que busque type filey con nombres que terminan en .cpp.
+
+abhishek@LHB:~$ find . -type f -name "*.cpp"
+./file.cpp
+./.cargo/registry/src/github.com-1ecc6299db9ec823/libz-sys-1.1.3/src/zlib/contrib/iostream2/zstream_test.cpp
+./.cargo/registry/src/github.com-1ecc6299db9ec823/libz-sys-1.1.3/src/zlib/contrib/iostream/test.cpp
+./.cargo/registry/src/github.com-1ecc6299db9ec823/libz-sys-1.1.3/src/zlib/contrib/iostream/zfstream.cpp
+
+Siempre ponga su expresión de búsqueda entre comillas dobles cuando use el comando de búsqueda.
+
+¿ Por qué recomiendo usar comillas dobles o comillas simples alrededor de su término de búsqueda? Porque si no hace eso, el shell expandirá el comodín.
+
+Si no envuelve su término de búsqueda entre comillas:
+
+find . -type f -name *.cpp
+
+Su shell expandirá *.cpp y lo reemplazará con todos los archivos en el directorio actual cuyos nombres terminan con .cpp.
+
+Esto podría funcionar si solo hay un archivo, pero si hay más de uno, su shell se quejará de una sintaxis incorrecta.
+Es importante usar comillas alrededor del nombre del archivo en la búsqueda del comando de búsqueda.
+
+En el ejemplo anterior, solo hay un archivo cpp y, por lo tanto, cuando el comando se expande a find . -type f -name file.cpp, funciona porque file.cpptodavía funciona como término de búsqueda.
+
+Pero hay dos archivos .txt en el mismo directorio y, por lo tanto, cuando el comando se expande a find . -type f -name another.txt new.txt, se queja porque ahora hay más de un término de búsqueda.
+
+Esta es la razón por la que siempre debe incluir su término de búsqueda entre comillas dobles.
+Busque varios archivos con varias extensiones (o condiciones)
+
+El comando anterior buscó archivos con una extensión determinada. ¿Qué sucede si desea buscar archivos con diferentes extensiones?
+
+En lugar de ejecutar el comando de búsqueda varias veces, ejecútelo una vez usando el -oopción que funciona como condición OR lógica:
+
+find . -type f -name "*.cpp" -o -name "*.txt" 
+
+Aquí hay un ejemplo:
+
+abhishek@LHB:~/Examples$ find . -type f -name "*.txt" -o -name "*.cpp"
+./new.txt
+./file.cpp
+./new/new.txt
+./new/dir2/another.txt
+./new/dir1/new.txt
+./another.txt
+
+Buscar archivos en un directorio específico
+
+Hasta ahora, todos los ejemplos realizaron búsquedas en el directorio actual porque especificó . en los ejemplos.
+
+El punto se puede reemplazar con una ruta absoluta o relativa de un directorio para que pueda buscar archivos en el directorio especificado sin salir de su ubicación actual.
+
+abhishek@LHB:~/Examples$ find ./new -name mystuff 
+./new/mystuff
+
+Buscar archivos en varios directorios
+
+Si cree que sus archivos deseados podrían estar ubicados en varias ubicaciones, no tiene que ejecutar el comando de búsqueda varias veces. Simplemente especifique todas las rutas de directorio para buscar en el comando de búsqueda:
+
+find ./location1 /second/location -type f -name "pattern"
+
+Encuentra archivos y directorios vacíos
+
+El -emptyLa opción le permite buscar archivos y directorios vacíos con el comando de búsqueda.
+
+Para encontrar todos los archivos y directorios vacíos en el directorio actual, use:
+
+find . -empty
+
+Puede especificar el tipo de archivo para buscar solo archivos o directorios vacíos:
+
+find . -empty -type f
+
+También puede combinarlo con la búsqueda de nombre de archivo:
+
+find . -empty -type f -name "*.cpp"
+
+Encontrar archivos y directorios vacíos con el comando de búsqueda
+Encuentre archivos grandes o pequeños (búsqueda basada en el tamaño del archivo)
+
+Puede encontrar archivos grandes o archivos pequeños según la búsqueda realizada por el parámetro de tamaño. Esto solo funciona con archivos, no con directorios.
+
+usas el -sizeopción con +N para tamaño mayor que N y -N para tamaño menor que N.
+
+Encuentre archivos de exactamente 50 KB de tamaño:
+
+find . -size 50k
+
+Para buscar archivos de más de 1 GB en el directorio actual:
+
+find . -size +1G
+
+Para encontrar menos de 20 bytes:
+
+find . -size -20c
+
+Para buscar archivos de más de 100 MB pero de menos de 2 GB:
+
+find . -size +100M -size -2G
+
+También puede combinar la búsqueda de tamaño con la búsqueda de nombre. Por ejemplo, para buscar todos los archivos con un nombre que termina en .log pero un tamaño superior a 500 MB en el directorio raíz, puede usar:
+
+find / -size +500M -name "*.log"
+
+Para recordar:
+
+    c: bytes
+    k: kilobytes
+    M: Megabytes
+    G: Gigabytes 
+
+Encuentre archivos modificados recientemente (búsqueda basada en modificación o tiempo de creación)
+
+Conoces el concepto de mtime, atime y ctime , ¿verdad?
+
+    mtime: última hora de modificación del archivo
+    ctime: tiempo de creación del archivo
+    atime: última hora de acceso al archivo 
+
+A menudo se encontrará en situaciones en las que desea encontrar todos los archivos modificados recientemente. La búsqueda por tiempo modificado ayuda en estos casos.
+
+Para encontrar todos los archivos modificados dentro de los 3 días (3*24H), use:
+
+find . -type f -mtime -3
+
+Para encontrar todos los archivos creados hace al menos 5 días (5*24H), use:
+
+find . -type f -ctime +5
+
+Sé que 24 horas es un marco de tiempo enorme. ¿Qué sucede si desea buscar archivos que se modificaron hace solo unos minutos? Para eso, puedes usar mmin, aminy cmin.
+
+Para encontrar todos los archivos que se modificaron en los últimos 5 minutos, use:
+
+find . -type f -mmin -5
+
+Use el comando de búsqueda para encontrar archivos modificados recientemente
+
+Puede especificar los límites superior e inferior junto con el nombre de búsqueda. El siguiente comando buscará todos los archivos .java que hayan sido modificados entre los últimos 20 a 30 minutos.
+
+find . -type f -mmin +20 -mmin -30 -name "*.java"
+
+Buscar archivos con permisos de archivo específicos
+
+Espero que esté familiarizado con el concepto de permisos de archivos en Linux .
+
+El comando de búsqueda le permite buscar archivos con permiso de archivo y modo de acceso específicos.
+
+find -perm mode
+
+Por ejemplo, para encontrar todos los archivos del modo de acceso 777 en el directorio actual;
+
+find . -perm 777
+
+Para encontrar todos los archivos con acceso de lectura y escritura para todos (coincidencia exacta, no coincidirá si el archivo tiene permiso de ejecución para todos):
+
+find . -perm a=r+w
+
+Buscar archivos propiedad de un usuario
+
+También puede buscar archivos según la propiedad.
+
+Por ejemplo, para buscar archivos propiedad del usuario John en el directorio actual, use:
+
+find . -type f -user John
+
+También puedes combinarlo con otras opciones como tamaño, hora y nombre:
+
+find . -type f -user John -name "*.cpp"
+
+No busque recursivamente, busque solo en el directorio actual
+
+De forma predeterminada, el comando de búsqueda busca recursivamente en todos los subdirectorios de su ubicación actual. Si no desea eso, puede especificar la profundidad de su búsqueda en 1. Esto restringirá la búsqueda solo al directorio actual y excluirá cualquier subdirectorio.
+
+find . -maxdepth 1 -type f -name "*.txt"
+
+Buscar solo en el directorio actual
+Excluir un directorio de la búsqueda
+
+si desea excluir un directorio de la búsqueda, puede hacerlo combinando ruta, poda y lógica o.
+
+find . -path "./directory_exclude/*" -prune -o -name SEARCH_NAME
+
+Tenga cuidado con el * en la ruta del directorio, -prunedespués del camino y -odespués de la poda.
+
+Básicamente, el comando podar pide no usar el valor especificado por la ruta. La ciruela pasa siempre se usa con -opara garantizar que el lado derecho de los términos se evalúe solo para los directorios que no fueron podados.
+Tomar medidas sobre el resultado de los comandos de búsqueda (exec y xargs)
+
+Hasta ahora, ha aprendido varias formas de encontrar archivos según varios criterios. Eso es bueno. Pero puede mejorarlo tomando ciertas acciones sobre el resultado del comando de búsqueda.
+
+Por ejemplo, ¿qué tal encontrar archivos que coincidan con cierto patrón de nombre y renombrarlos todos a la vez o encontrar archivos vacíos y eliminarlos?
+
+Sabe que la redirección de tubería se puede usar para combinar la salida de un comando con la entrada de otro comando. Pero esto no funcionará con la salida del comando de búsqueda, al menos no directamente.
+
+Tiene dos opciones si desea realizar una acción sobre el resultado del comando de búsqueda:
+
+    Usar ejecutivo
+    Usar xargs 
+
+Uso de buscar y ejecutar
+
+Suponga que desea hacer una lista larga (ls -l) de los archivos de búsqueda con el comando de búsqueda. Esto es lo que usas:
+
+find . -type f -name "*.txt" -exec ls -l {} +
+
+Aquí está la salida:
+
+abhishek@LHB:~/Examples$ find . -type f -name "*.txt" -exec ls -l {} +
+-rw-rw-r-- 1 abhishek abhishek 39 Oct 13 19:30 ./another.txt
+-rw-rw-r-- 1 abhishek abhishek 35 Oct 13 15:36 ./new/dir1/new.txt
+-rw-rw-r-- 1 abhishek abhishek 35 Oct 13 15:36 ./new/dir2/another.txt
+-rw-rw-r-- 1 abhishek abhishek 35 Oct 13 18:51 ./new/mystuff/new.txt
+-rwxrwxrwx 1 abhishek abhishek 35 Oct 13 15:37 ./new/new.txt
+-rw-rw-r-- 1 abhishek abhishek 35 Oct 13 18:16 ./new.txt
+
+Muchas personas se olvidan de agregar el {} +al final del comando exec. Debe usarlo y tener en cuenta el espacio entre {} y +.
+
+El {} es lo que hace referencia al resultado del comando de búsqueda. Puedes imaginarlo como {archivo 1, archivo 2, archivo 3}. El +El signo se utiliza para finalizar el comando exec.
+
+También hay otra convención con exec:
+
+find . -type f -name *.txt" -exec ls -l {} \;
+
+Aquí, ; se utiliza en lugar del signo +. El adicional \ before ; se utiliza para escapar del carácter especial ;.
+
+La ventaja de {} +es que ejecuta menos comandos como ls -l file1 file2 file3mientras {} \;correrá ls -l file1, ls -l file2etc.
+
+Pero, {} \;tiene la ventaja de usar {}más de una vez en la misma declaración ejecutiva. Por ejemplo, el siguiente comando cambiará el nombre de todos los archivos encontrados con la extensión .old.
+
+find . -type f -name *.txt" -exec mv {} {}.old \;
+
+Usando xargs
+
+Muchos usuarios de Linux se acostumbran a la redirección de tuberías. Este comando exec con el final {} +les parece intimidante.
+
+Aquí es donde xargs ayuda. Simplemente analiza la salida del comando de búsqueda al comando xargs a través de una tubería.
+
+find . -type f -name *.txt" | xargs ls -l
+
+Ejemplo de comando find y xargs
+
+La sintaxis parece mucho más simple, ¿verdad? El comando Xargs también es muy poderoso. Puede leer sobre esto aquí.
+Combinando find y grep
+
+Ahora que sabe cómo combinar find con exec y el comando xargs, puede usarlo para combinar find y grep.
+
+Para cualquier administrador de sistemas o desarrollador de software, find y grep es una de las combinaciones más comunes y, sin embargo, más útiles.
+
+Busca patrones de nombre de archivo con find y luego usa grep para buscar el contenido dentro de esos archivos.
+
+Por ejemplo, desea buscar todos los archivos .txt que contienen el término Alice. Combinas find y grep así:
+
+find . -type f -name "*.txt" -exec grep -i alice {} +
+
+Lo mismo se puede lograr con xargs también:
+
+find . -type f -name "*.txt" | xargs grep -i alice
+
+Ejemplo de buscar y grep
+
+Por supuesto, este es el más simple de los ejemplos, pero si está familiarizado con el comando grep , puede usarlo a su gusto y necesidad. 
+          
+  
