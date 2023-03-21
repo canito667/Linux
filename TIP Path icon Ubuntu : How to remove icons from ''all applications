@@ -1,0 +1,5 @@
+Path iconos de las aplicaciones instaladas:
+
+          cd /usr/share/applications
+
+          sudo rm <name-of-application>.desktop
