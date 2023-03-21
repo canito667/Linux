@@ -1,6 +1,0 @@
-Nos hace falta el driver para poder compartir la conexión a Internet del iPhone en Ubuntu, lo solucionamos de forma sencilla en un Terminal:
-sudo add-apt-repository ppa:pmcenery/ppa
-sudo apt-get update
-sudo apt-get install gvfs ipheth-utils
-
-Es necesario tener habilitada la opción de «Compartir Internet» en el iPhone (Ajustes->General->Red->Compartir Internet)
