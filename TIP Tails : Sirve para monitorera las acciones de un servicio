@@ -1,1 +1,5 @@
 https://www.howtogeek.com/481766/how-to-use-the-tail-command-on-linux/
+
+ejemplo si quiero ver los cambios moddificaiones o acciones de una apmicaion puedo leer un archivo log y ver cada uno de sus cambios
+
+tails -f <ARCHIVO .LOG>
